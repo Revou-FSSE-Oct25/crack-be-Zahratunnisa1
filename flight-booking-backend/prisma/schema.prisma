@@ -1,0 +1,39 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider = "mongodb"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  email    String @unique
+  name     String?
+  password String
+  role     Role   @default(BUYER)
+}
+
+enum Role {
+  ADMIN
+  BUYER
+}
+
+
+model Flight {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  airline     String
+  from        String
+  to          String
+  departure   DateTime
+  arrival     DateTime
+  price       Int
+  seats       Int
+  createdAt   DateTime @default(now())
+}
