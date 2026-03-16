@@ -1,12 +1,41 @@
-import { Controller, Get } from '@nestjs/common'
-import { FlightsService } from './flights.service'
+import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { FlightsService } from './flights.service';
+import { CreateFlightsDto } from './dto/create-flights.dto';
+import { UpdateFlightsDto } from './dto/update-flights.dto';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller('flights')
+@UseGuards(RolesGuard)
 export class FlightsController {
-  constructor(private flightsService: FlightsService) {}
+  constructor(private readonly flightsService: FlightsService) {}
 
+  // GET → semua bisa akses
   @Get()
-  getFlights() {
-    return this.flightsService.findAll()
+  async getAllFlights() {
+    return this.flightsService.findAll();
+  }
+
+  // POST → admin only
+  @Post()
+  @Roles('admin')
+  async createFlight(@Body() createFlightsDto: CreateFlightsDto) {
+    return this.flightsService.createFlight(createFlightsDto);
+  }
+
+  // PUT → admin only
+  @Put(':id')
+  @Roles('admin')
+  async updateFlight(@Param('id') id: string, @Body() updateFlightsDto: UpdateFlightsDto) {
+    return this.flightsService.updateFlight(id, updateFlightsDto);
+  }
+
+  // DELETE → admin only
+  @Delete(':id')
+  @Roles('admin')
+  async deleteFlight(@Param('id') id: string) {
+    return this.flightsService.deleteFlight(id);
   }
 }
+
+

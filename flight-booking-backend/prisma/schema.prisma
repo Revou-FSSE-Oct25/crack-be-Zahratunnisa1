@@ -6,6 +6,7 @@
 
 datasource db {
   provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -18,6 +19,9 @@ model User {
   name     String?
   password String
   role     Role   @default(BUYER)
+
+  bookings Booking[]
+
 }
 
 enum Role {
@@ -31,9 +35,22 @@ model Flight {
   airline     String
   from        String
   to          String
-  departure   DateTime
-  arrival     DateTime
+  departureTime   DateTime
+  arrivalTime     DateTime
   price       Int
   seats       Int
   createdAt   DateTime @default(now())
+  bookings Booking[]
+}
+
+model Booking {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  flightId  String   @db.ObjectId
+  seats     Int
+  status    String   @default("CONFIRMED")
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  flight Flight @relation(fields: [flightId], references: [id])
 }
