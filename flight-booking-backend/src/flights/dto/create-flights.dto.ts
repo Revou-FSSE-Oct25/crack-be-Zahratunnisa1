@@ -14,10 +14,10 @@ export class CreateFlightsDto {
   price: number;
 
   @IsDateString()
-  departure: string;
+  departureTime: string;
 
   @IsDateString()
-  arrival: string;
+  arrivalTime: string;
 
   @IsNumber()
   seats: number;

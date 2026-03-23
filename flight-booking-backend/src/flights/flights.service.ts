@@ -3,37 +3,55 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateFlightsDto } from './dto/create-flights.dto';
 import { UpdateFlightsDto } from './dto/update-flights.dto';
 
+
 @Injectable()
 export class FlightsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // GET semua flight
   async findAll() {
     return this.prisma.flight.findMany();
   }
 
-  // POST flight baru
-  async createFlight(data: CreateFlightsDto) {
+  async createFlights(data: CreateFlightsDto) {
     return this.prisma.flight.create({
-      data,
+      data: {
+        airline: data.airline,
+        from: data.from,
+        to: data.to,
+        departureTime: new Date(data.departureTime),
+        arrivalTime: new Date(data.arrivalTime),
+        price: Number(data.price),
+        seats: Number(data.seats),
+      },
     });
   }
 
-  // PUT update flight berdasarkan id
-  async updateFlight(id: string, data: UpdateFlightsDto) {
+  async updateFlight(id: number, data: UpdateFlightsDto) {
     return this.prisma.flight.update({
       where: { id },
-      data,
+      data: {
+        ...(data.airline && { airline: data.airline }),
+        ...(data.from && { from: data.from }),
+        ...(data.to && { to: data.to }),
+        ...(data.departureTime && {
+          departureTime: new Date(data.departureTime),
+        }),
+        ...(data.arrivalTime && {
+          arrivalTime: new Date(data.arrivalTime),
+        }),
+        ...(data.price && { price: Number(data.price) }),
+        ...(data.seats && { seats: Number(data.seats) }),
+      },
     });
   }
 
-  // DELETE flight berdasarkan id
-  async deleteFlight(id: string) {
+  async deleteFlight(id: number) {
     return this.prisma.flight.delete({
       where: { id },
     });
   }
 }
+
 
 
 
