@@ -3,15 +3,21 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateFlightsDto } from './dto/create-flights.dto';
 import { UpdateFlightsDto } from './dto/update-flights.dto';
 
-
 @Injectable()
 export class FlightsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll() {
-    return this.prisma.flight.findMany();
+  // GET semua / filter flight
+  async findAll(from?: string, to?: string) {
+    return this.prisma.flight.findMany({
+      where: {
+        ...(from && { from }),
+        ...(to && { to }),
+      },
+    });
   }
 
+  // CREATE flight
   async createFlights(data: CreateFlightsDto) {
     return this.prisma.flight.create({
       data: {
@@ -26,6 +32,7 @@ export class FlightsService {
     });
   }
 
+  // UPDATE flight
   async updateFlight(id: number, data: UpdateFlightsDto) {
     return this.prisma.flight.update({
       where: { id },
@@ -45,12 +52,14 @@ export class FlightsService {
     });
   }
 
+  // DELETE flight
   async deleteFlight(id: number) {
     return this.prisma.flight.delete({
       where: { id },
     });
   }
 }
+
 
 
 
