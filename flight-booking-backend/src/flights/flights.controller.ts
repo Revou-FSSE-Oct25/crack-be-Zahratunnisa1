@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, Query } from '@nestjs/common';
 import { FlightsService } from './flights.service';
 import { CreateFlightsDto } from './dto/create-flights.dto';
 import { UpdateFlightsDto } from './dto/update-flights.dto';
@@ -13,9 +13,18 @@ export class FlightsController {
 
   // GET → semua bisa akses
   @Get()
-  async getAllFlights() {
-    return this.flightsService.findAll();
+  findAll(
+    @Query('from') from?: string,
+    @Query('to') to?: string,
+  ) {
+    return this.flightsService.findAll(from, to);
   }
+
+  @Get(':id')
+findOne(@Param('id') id: string) {
+  return this.flightsService.findOne(Number(id));
+}
+
 
   // POST → admin only
   @Post()

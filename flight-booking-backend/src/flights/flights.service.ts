@@ -17,6 +17,13 @@ export class FlightsService {
     });
   }
 
+  async findOne(id: number) {
+  return this.prisma.flight.findUnique({
+    where: { id },
+  });
+}
+
+
   // CREATE flight
   async createFlights(data: CreateFlightsDto) {
     return this.prisma.flight.create({
