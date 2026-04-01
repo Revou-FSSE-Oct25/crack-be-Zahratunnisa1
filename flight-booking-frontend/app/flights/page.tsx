@@ -25,6 +25,7 @@ export default function FlightsPage() {
   return (
     <div style={{ padding: 20 }}>
       <h1>✈️ Search Flights</h1>
+       <a href="/my-bookings">📜 Lihat Booking Saya</a>
 
       <div style={{ marginBottom: 20 }}>
         <input

@@ -13,7 +13,7 @@ export class BookingsController {
   }
 
   @Get('my')
-  getMyBookings(@Req() req) {
+  getMyBookings(){
     const userId = 1;
     return this.bookingsService.findMyBookings(userId);
   }
