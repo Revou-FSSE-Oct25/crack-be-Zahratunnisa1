@@ -28,6 +28,7 @@ export class AuthService {
     const payload = {
       sub: user.id,
       email: user.email,
+      role: user.role,
     };
 
     return {
@@ -50,6 +51,7 @@ export class AuthService {
     const payload = {   // ✅ INI YANG KURANG TADI
       sub: user.id,
       email: user.email,
+      role: user.role,
     };
 
     return {

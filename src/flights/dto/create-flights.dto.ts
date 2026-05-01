@@ -1,24 +1,24 @@
-import { IsString, IsNumber, IsDateString } from 'class-validator';
+import { IsString, IsInt, IsDateString } from 'class-validator';
 
 export class CreateFlightsDto {
   @IsString()
-  airline: string;
+  airline!: string;
 
   @IsString()
-  from: string;
+  from!: string;
 
   @IsString()
-  to: string;
-
-  @IsNumber()
-  price: number;
+  to!: string;
 
   @IsDateString()
-  departureTime: string;
+  departureTime!: string;
 
   @IsDateString()
-  arrivalTime: string;
+  arrivalTime!: string;
 
-  @IsNumber()
-  seats: number;
+  @IsInt()
+  price!: number;
+
+  @IsInt()
+  seats!: number;
 }

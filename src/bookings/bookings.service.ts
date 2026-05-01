@@ -24,6 +24,7 @@ export class BookingsService {
         throw new BadRequestException('Kursi tidak cukup');
       }
 
+      // update seats
       await this.prisma.flight.update({
         where: { id: data.flightId },
         data: {
@@ -31,14 +32,23 @@ export class BookingsService {
         },
       });
 
+      // create booking + passengers
       const booking = await this.prisma.booking.create({
         data: {
           userId,
           flightId: data.flightId,
           seats: data.seats,
-          status: "PENDING", // 🔥 tambah ini
-          totalPrice: 1000000, // sementara
-          expiresAt: new Date(Date.now() + 1000 * 60 * 15), // 15 menit
+          status: "PENDING",
+          totalPrice: flight.price * data.seats,
+          expiresAt: new Date(Date.now() + 1000 * 60 * 15),
+
+          passengers: {
+            create: data.passengers,
+          },
+        },
+        include: {
+          passengers: true,
+          flight: true,
         },
       });
 
@@ -51,28 +61,29 @@ export class BookingsService {
   }
 
   async findMyBookings(userId: number) {
-    await this.checkExpired(); // 🔥 penting
+    await this.checkExpired();
 
     return this.prisma.booking.findMany({
       where: { userId },
       include: {
         flight: true,
+        passengers: true, // 🔥 penting
       },
     });
   }
 
   async findOne(id: number, userId: number) {
-    await this.checkExpired(); // 🔥 juga di sini
+    await this.checkExpired();
 
     return this.prisma.booking.findFirst({
       where: { id, userId },
       include: {
         flight: true,
+        passengers: true, // 🔥 penting
       },
     });
   }
 
-  // 🔥 TARUH DI SINI (bukan bikin class baru)
   async checkExpired() {
     await this.prisma.booking.updateMany({
       where: {
@@ -86,25 +97,36 @@ export class BookingsService {
       },
     });
   }
+
+  // ✅ PAY BOOKING
   async pay(id: number, userId: number) {
-  const booking = await this.prisma.booking.findFirst({
-    where: { id, userId },
-  });
+    const booking = await this.prisma.booking.findFirst({
+      where: { id, userId },
+    });
 
-  if (!booking) {
-    throw new NotFoundException("Booking tidak ditemukan");
+    if (!booking) {
+      throw new NotFoundException("Booking tidak ditemukan");
+    }
+
+    if (booking.status !== "PENDING") {
+      throw new BadRequestException("Booking sudah dibayar / expired");
+    }
+
+    return this.prisma.booking.update({
+      where: { id },
+      data: {
+        status: "PAID",
+      },
+    });
   }
 
-  if (booking.status !== "PENDING") {
-    throw new BadRequestException("Booking sudah dibayar / expired");
+  // 🔥 CANCEL / DELETE BOOKING
+  async remove(id: number, userId: number) {
+    return this.prisma.booking.delete({
+      where: {
+        id,
+        userId,
+      },
+    });
   }
-
-  return this.prisma.booking.update({
-    where: { id },
-    data: {
-      status: "PAID",
-    },
-  });
 }
-}
-

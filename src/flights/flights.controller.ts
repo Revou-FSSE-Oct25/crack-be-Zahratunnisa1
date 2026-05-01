@@ -1,17 +1,13 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, Query, ParseIntPipe } from '@nestjs/common';
 import { FlightsService } from './flights.service';
 import { CreateFlightsDto } from './dto/create-flights.dto';
 import { UpdateFlightsDto } from './dto/update-flights.dto';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
-import { ParseIntPipe } from '@nestjs/common';
 
 @Controller('flights')
-@UseGuards(RolesGuard)
 export class FlightsController {
   constructor(private readonly flightsService: FlightsService) {}
 
-  // GET → semua bisa akses
+  // GET semua flight
   @Get()
   findAll(
     @Query('from') from?: string,
@@ -20,35 +16,33 @@ export class FlightsController {
     return this.flightsService.findAll(from, to);
   }
 
+  // GET by id
   @Get(':id')
-findOne(@Param('id') id: string) {
-  return this.flightsService.findOne(Number(id));
-}
+  findOne(@Param('id') id: string) {
+    return this.flightsService.findOne(Number(id));
+  }
 
-
-  // POST → admin only
+  // ✅ CREATE (tanpa auth dulu)
   @Post()
-  @Roles('admin')
-  async createFlights(@Body() createFlightsDto: CreateFlightsDto) {
+  createFlights(@Body() createFlightsDto: CreateFlightsDto) {
     return this.flightsService.createFlights(createFlightsDto);
   }
 
-  // PUT → admin only
+  // UPDATE
   @Put(':id')
-@Roles('admin')
-async updateFlight(
-  @Param('id', ParseIntPipe) id: number,
-  @Body() updateFlightsDto: UpdateFlightsDto
-) {
-  return this.flightsService.updateFlight(id, updateFlightsDto);
-}
+  updateFlight(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateFlightsDto: UpdateFlightsDto
+  ) {
+    return this.flightsService.updateFlight(id, updateFlightsDto);
+  }
 
-  // DELETE → admin only
+  // DELETE
   @Delete(':id')
-  @Roles('admin')
-  async deleteFlight(@Param('id') id: number) {
+  deleteFlight(@Param('id', ParseIntPipe) id: number) {
     return this.flightsService.deleteFlight(id);
   }
 }
+
 
 

@@ -1,12 +1,14 @@
-import { IsInt, IsString, IsEmail } from 'class-validator';
+import {
+  IsInt,
+  IsString,
+  IsEmail,
+  ValidateNested,
+  IsArray,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
-export class CreateBookingDto {
-  @IsInt()
- flightId!: number;
-
-  @IsInt()
- seats!: number;
-
+// 🔹 DTO untuk 1 penumpang
+class PassengerDto {
   @IsString()
   name!: string;
 
@@ -16,5 +18,20 @@ export class CreateBookingDto {
   @IsString()
   phone!: string;
 }
+
+// 🔹 DTO utama booking
+export class CreateBookingDto {
+  @IsInt()
+  flightId!: number;
+
+  @IsInt()
+  seats!: number;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => PassengerDto)
+  passengers!: PassengerDto[];
+}
+
 
 

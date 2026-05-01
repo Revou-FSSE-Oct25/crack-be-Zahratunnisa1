@@ -26,6 +26,7 @@ export class FlightsService {
 
   // CREATE flight
   async createFlights(data: CreateFlightsDto) {
+    console.log("DATA MASUK:", data);
     return this.prisma.flight.create({
       data: {
         airline: data.airline,

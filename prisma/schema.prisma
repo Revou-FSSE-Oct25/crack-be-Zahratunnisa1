@@ -18,9 +18,25 @@ model User {
   bookings Booking[]
 }
 
+model Passenger {
+  id        Int     @id @default(autoincrement())
+  name      String
+  email     String
+  phone     String
+  booking   Booking @relation(fields: [bookingId], references: [id])
+  bookingId Int
+}
+
 enum Role {
   ADMIN
   BUYER
+}
+
+enum BookingStatus {
+  PENDING
+  PAID
+  EXPIRED
+  CANCELLED
 }
 
 model Flight {
@@ -38,15 +54,18 @@ model Flight {
 }
 
 model Booking {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  flightId  Int
-  seats     Int
-  status    String   @default("CONFIRMED")
-  createdAt DateTime @default(now())
-  totalPrice  Int @default(0)
-  expiresAt   DateTime @default(now())
+  id         Int            @id @default(autoincrement())
+  userId     Int
+  flightId   Int
+  seats      Int
+  status     BookingStatus  @default(PENDING)
+  createdAt  DateTime       @default(now())
+  totalPrice Int            @default(0)
+  expiresAt  DateTime       @default(now())
+
+  passengers Passenger[]
 
   user   User   @relation(fields: [userId], references: [id])
   flight Flight @relation(fields: [flightId], references: [id])
 }
+

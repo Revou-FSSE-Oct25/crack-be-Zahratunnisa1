@@ -1,10 +1,7 @@
-import { Controller, Post, Body, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, Req, UseGuards, Param, Patch, Delete } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { JwtGuard } from '../auth/jwt.guard';
-import { Param } from '@nestjs/common';
-import { Patch } from '@nestjs/common';
-
 
 @UseGuards(JwtGuard)
 
@@ -36,4 +33,9 @@ payBooking(@Param('id') id: string, @Req() req) {
   return this.bookingsService.pay(Number(id), req.user.id);
 }
 
+@Delete(':id')
+  remove(@Param('id') id: string, @Req() req) {
+    return this.bookingsService.remove(Number(id), req.user.id);
+
+}
 }
