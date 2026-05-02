@@ -1,13 +1,27 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, Query, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  Query,
+  ParseIntPipe,
+  UseGuards,
+} from '@nestjs/common';
 import { FlightsService } from './flights.service';
 import { CreateFlightsDto } from './dto/create-flights.dto';
 import { UpdateFlightsDto } from './dto/update-flights.dto';
+import { JwtGuard } from '../auth/jwt.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller('flights')
 export class FlightsController {
   constructor(private readonly flightsService: FlightsService) {}
 
-  // GET semua flight
+  // ✅ PUBLIC (boleh semua user)
   @Get()
   findAll(
     @Query('from') from?: string,
@@ -16,19 +30,22 @@ export class FlightsController {
     return this.flightsService.findAll(from, to);
   }
 
-  // GET by id
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.flightsService.findOne(Number(id));
   }
 
-  // ✅ CREATE (tanpa auth dulu)
+  // 🔐 ADMIN ONLY
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles('ADMIN')
   @Post()
   createFlights(@Body() createFlightsDto: CreateFlightsDto) {
     return this.flightsService.createFlights(createFlightsDto);
   }
 
-  // UPDATE
+  // 🔐 ADMIN ONLY
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles('ADMIN')
   @Put(':id')
   updateFlight(
     @Param('id', ParseIntPipe) id: number,
@@ -37,12 +54,11 @@ export class FlightsController {
     return this.flightsService.updateFlight(id, updateFlightsDto);
   }
 
-  // DELETE
+  // 🔐 ADMIN ONLY
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles('ADMIN')
   @Delete(':id')
   deleteFlight(@Param('id', ParseIntPipe) id: number) {
     return this.flightsService.deleteFlight(id);
   }
 }
-
-
-
