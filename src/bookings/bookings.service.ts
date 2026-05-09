@@ -17,11 +17,11 @@ export class BookingsService {
       });
 
       if (!flight) {
-        throw new NotFoundException('Flight tidak ditemukan');
+        throw new NotFoundException('Flight didnt found');
       }
 
       if (flight.seats < data.seats) {
-        throw new BadRequestException('Kursi tidak cukup');
+        throw new BadRequestException('Seats doesnt available');
       }
 
       // update seats
@@ -120,13 +120,78 @@ export class BookingsService {
     });
   }
 
-  // 🔥 CANCEL / DELETE BOOKING
-  async remove(id: number, userId: number) {
-    return this.prisma.booking.delete({
-      where: {
-        id,
-        userId,
-      },
-    });
+// 🔥 CANCEL / DELETE BOOKING
+async remove(id: number, userId: number) {
+
+  const booking = await this.prisma.booking.findFirst({
+    where: {
+      id,
+      userId,
+    },
+  });
+
+  if (!booking) {
+    throw new Error("Booking tidak ditemukan");
   }
+
+  // ✅ hapus semua passenger dulu
+  await this.prisma.passenger.deleteMany({
+    where: {
+      bookingId: id,
+    },
+  });
+
+  // ✅ baru hapus booking
+  return this.prisma.booking.delete({
+    where: {
+      id,
+    },
+  });
+}
+  
+  async findAllBookings() {
+  return this.prisma.booking.findMany({
+    include: {
+      user: true,
+      flight: true,
+      passengers: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+}
+// ✅ ADMIN CONFIRM BOOKING
+async confirmBooking(id: number) {
+  return this.prisma.booking.update({
+    where: { id },
+    data: {
+      status: 'CONFIRMED',
+    },
+  });
+}
+
+// ❌ ADMIN REJECT BOOKING
+async rejectBooking(id: number) {
+  return this.prisma.booking.update({
+    where: { id },
+    data: {
+      status: 'REJECTED',
+    },
+  });
+}
+
+// 🔥 ADMIN DELETE BOOKING
+async adminDeleteBooking(id: number) {
+
+  await this.prisma.passenger.deleteMany({
+    where: {
+      bookingId: id,
+    },
+  });
+
+  return this.prisma.booking.delete({
+    where: { id },
+  });
+}
 }

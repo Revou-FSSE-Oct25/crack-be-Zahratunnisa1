@@ -35,6 +35,8 @@ enum Role {
 enum BookingStatus {
   PENDING
   PAID
+  CONFIRMED
+  REJECTED
   EXPIRED
   CANCELLED
 }
