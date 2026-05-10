@@ -15,6 +15,10 @@ model User {
   password String
   role     Role    @default(BUYER)
 
+  fullName   String?
+  phone      String?
+  birthDate  DateTime?
+  
   bookings Booking[]
 }
 

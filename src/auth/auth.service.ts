@@ -49,7 +49,14 @@ async login(email: string, password: string) {
         email: body.email.trim().toLowerCase(),
         password: hashedPassword,
         role: 'BUYER',
-      },
+
+        fullName: body.fullName,
+        phone: body.phone,
+
+        birthDate: body.birthDate
+          ? new Date(body.birthDate)
+          : null,
+    },
     });
 
     const payload = {   // ✅ INI YANG KURANG TADI
